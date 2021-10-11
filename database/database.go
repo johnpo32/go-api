@@ -2,6 +2,7 @@ package database
 
 import (
 	"api/config"
+	"api/model"
 	"fmt"
 	"strconv"
 
@@ -24,6 +25,6 @@ func Connect() {
 
 	fmt.Println("Connection Opened")
 
-	DB.AutoMigrate()
-	defer DB.Close()
+	DB.AutoMigrate(&model.Country{})
+
 }
