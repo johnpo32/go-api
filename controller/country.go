@@ -33,3 +33,19 @@ func PostCountry(c *fiber.Ctx) error {
 
 	return c.JSON(fiber.Map{"status": "ok"})
 }
+
+func GetCountry(c *fiber.Ctx) error {
+
+	id := c.Params("id")
+	db := database.DB // database connection
+	var country model.Country
+
+	if err := db.Find(&country, "id = ?", id).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"status": "error", "data": err})
+	}
+	if country.ID == uuid.Nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"status": "error", "data": "Id error"})
+	}
+
+	return c.JSON(fiber.Map{"status": "ok", "data": country})
+}

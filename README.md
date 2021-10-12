@@ -1,3 +1,3 @@
 # Golang REST API
 
-This RESTful API provides services with fiber.
+The database is Postgres, but use whatever database you prefer
