@@ -49,3 +49,24 @@ func GetCountry(c *fiber.Ctx) error {
 
 	return c.JSON(fiber.Map{"status": "ok", "data": country})
 }
+
+func GetCountries(c *fiber.Ctx) error {
+
+	db := database.DB
+	var countries []model.Country
+
+	if err := db.Find(&countries).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"status": "error", "data": err})
+	}
+
+	var val []interface{}
+
+	for _, row := range countries {
+		cont := Country{
+			Name: row.Name,
+		}
+		val = append(val, cont)
+	}
+
+	return c.JSON(fiber.Map{"status": "ok", "data": val})
+}
