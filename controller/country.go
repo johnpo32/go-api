@@ -9,7 +9,8 @@ import (
 )
 
 type Country struct {
-	Name string `json:"name"`
+	ID   uuid.UUID `json:"id"`
+	Name string    `json:"name"`
 }
 
 func PostCountry(c *fiber.Ctx) error {
@@ -38,7 +39,7 @@ func GetCountry(c *fiber.Ctx) error {
 
 	id := c.Params("id")
 	db := database.DB // database connection
-	var country model.Country
+	var country Country
 
 	if err := db.Find(&country, "id = ?", id).Error; err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"status": "error", "data": err})
@@ -63,10 +64,43 @@ func GetCountries(c *fiber.Ctx) error {
 
 	for _, row := range countries {
 		cont := Country{
+			ID:   row.ID,
 			Name: row.Name,
 		}
 		val = append(val, cont)
 	}
 
 	return c.JSON(fiber.Map{"status": "ok", "data": val})
+}
+
+func PatchCountry(c *fiber.Ctx) error {
+
+	id := c.Params("id")
+	db := database.DB
+
+	type UpdateInput struct {
+		Name string `json:"name"`
+	}
+
+	var upd UpdateInput
+
+	if err := c.BodyParser(&upd); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"status": "error", "message": "Review your input", "data": err})
+	}
+
+	var country model.Country
+	db.Find(&country, "id = ?", id)
+
+	country.Name = upd.Name
+
+	if err := db.Save(&country).Error; err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"status": "error", "data": err})
+	}
+
+	newCountry := Country{
+		ID:   country.ID,
+		Name: country.Name,
+	}
+
+	return c.JSON(fiber.Map{"status": "ok", "data": newCountry})
 }
