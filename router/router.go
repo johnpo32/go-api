@@ -11,4 +11,5 @@ func Router(app *fiber.App) {
 	app.Get("/country/:id", controller.GetCountry)
 	app.Get("/country", controller.GetCountries)
 	app.Patch("/country/:id", controller.PatchCountry)
+	app.Delete("/country/:id", controller.DeleteCountry)
 }

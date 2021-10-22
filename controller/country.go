@@ -104,3 +104,17 @@ func PatchCountry(c *fiber.Ctx) error {
 
 	return c.JSON(fiber.Map{"status": "ok", "data": newCountry})
 }
+
+func DeleteCountry(c *fiber.Ctx) error {
+
+	id := c.Params("id")
+	db := database.DB
+
+	var country model.Country
+
+	if err := db.Where("id = ?", id).Delete(&country).Error; err != nil {
+		return c.Status(fiber.ErrBadRequest.Code).JSON(fiber.Map{"status": "error", "data": err})
+	}
+
+	return c.JSON(fiber.Map{"status": "success", "message": "Country deleted", "data": nil})
+}
